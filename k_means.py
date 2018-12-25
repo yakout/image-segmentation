@@ -50,36 +50,5 @@ class KMeans():
 
     def fit(self, X):
         return k_means(X, self.n_clusters, self.n_clusters)
-        
-
-
-
-def segment(img, n_clusters=DEFAULT_N_CLUSTERS, max_iter=K_MEANS_DEFAULT_MAX_ITER):
-    original_img_shape = img.shape
-    feature_count = img.shape[2]
-    img_2D_array = img.reshape(-1, feature_count)
-
-#     kmeans=KMeans(
-#         random_state=RANDOM_SEED
-#         ,n_clusters=n_clusters # number of clusters we expect are in data
-#         ,max_iter=max_iter # max number of iterations before we force algo to stop whether it converged or not
-#         ,n_init=1# number of runs with diff cluster centers to start with
-#         ,init='random' # use random cluster centers
-#         ,algorithm='full' # use classic kmeans algo
-#     )
-    
-#     seg_array = kmeans.fit(img_2D_array)
-#     labels_list = np.array(seg_array.labels_)
-#     labels_array = labels_list.reshape((original_img_shape[0], original_img_shape[1])) # reshape to 2D array to match up with image pixels
-
-#     return labels_array
-    
-    kmeans=KMeans(n_clusters, max_iter)
-    return kmeans.fit(img_2D_array)
-
-
-# img = np.array(get_image('2092', 'train'))
-# seg_array = segment(img)
-# plt.imshow(seg_array)
 
 
