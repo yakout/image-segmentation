@@ -86,7 +86,7 @@ def get_gt_image(img_name, category):
     gt = np.array(gt)
     return gt
 
-def load_images(category):
+def load_images(category, limit=False, max_limit=5):
     """
     load images from path for given category set (test, train, val)
     """
@@ -95,7 +95,7 @@ def load_images(category):
     count = 0
     for root, dirnames, filenames in os.walk(f'{BERKELEY_IMG_DIR}/{category}'):
         for image_name in filenames:
-            if count > 2:
+            if limit and count >= max_limit:
                 break
             count += 1
             if image_name.split('.')[1] != 'jpg':
