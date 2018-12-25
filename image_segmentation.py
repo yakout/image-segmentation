@@ -33,7 +33,7 @@ def kmeans_segment(img, n_clusters=DEFAULT_N_CLUSTERS, max_iter=K_MEANS_DEFAULT_
 # seg_array = segment(img)
 # plt.imshow(seg_array)
 
-def spectral_segment(img, n_clusters=11,
+def spectral_segment(img, n_clusters=5,
                           n_neighbors=5,
                           gamma=1,
                           affinity='nearest_neighbors',
@@ -43,8 +43,8 @@ def spectral_segment(img, n_clusters=11,
 
     include_spatial : (Bonus: TODO)
     """
-#     img = resize(img, (70, 105), anti_aliasing=True)
-    img = imresize(img, 0.3) / 255
+    img = resize(img, (int(img.shape[0] * 0.3), int(img.shape[1] * 0.3)), anti_aliasing=True)
+    # img = imresize(img, 0.3) / 255
     n = img.shape[0]
     m = img.shape[1]
     colors = img.shape[2]
@@ -53,27 +53,32 @@ def spectral_segment(img, n_clusters=11,
     # gamma is ignored for affinity='nearest_neighbors'
     # n_neighbors is ignore for affinity='rbf'
     # n_jobs = -1 means using all processors :D
-    spectral = SpectralClustering(n_clusters=n_clusters,
+    labels = SpectralClustering(n_clusters=n_clusters,
                                   affinity=affinity,
                                   gamma=gamma,
                                   n_neighbors=n_neighbors,
                                   n_jobs=-1,
                                   eigen_solver='arpack'
-                                  ).fit(img)
-    labels = spectral.labels_
+                                  ).fit_predict(img)
     labels = labels.reshape(n, m)
     return labels
 
 
-def spectral_segment_images(X, n_clusters=n_clusters,
+def spectral_segment_images(X, y=None, n_clusters=n_clusters,
                                affinity='nearest_neighbors',
                                n_neighbors=5,
                                gamma=1,
                                include_spatial=False,
-                               cache=False, load_from_cache=False):
+                               cache=False, load_from_cache=False,
+                               visualize=False):
     """
     n_clusters : array of K values
     will return (N, K, d)
+
+    cache : to save segmented images to disk
+    load_from_cache : to load previously segmented images from disk
+    visualize : visualize the original images with the segmented images against
+                its ground truth images. (Must provide y)
     """
     if load_from_cache:
         return np.load('./cache/spectral_segment_images.txt')
@@ -90,10 +95,8 @@ def spectral_segment_images(X, n_clusters=n_clusters,
                                         n_neighbors=n_neighbors,
                                         gamma=gamma,
                                         include_spatial=include_spatial)
-            plt.figure()
-            plt.imshow(X[i])
-            plt.figure()
-            plt.imshow(res)
+            if visualize and y != None:
+                visualize_result(X[i], res, y[i])
             K_images.append(res)
         clustered_images.append(K_images)
     clustered_images = np.array(clustered_images)
@@ -102,6 +105,7 @@ def spectral_segment_images(X, n_clusters=n_clusters,
         np.save('./cache/spectral_segment_images.txt', clustered_images)
     # print(images.shape)
     return clustered_images
+        
 
 def kmeans_segment_images(X, n_clusters=n_clusters, cache=False, load_from_cache=False):
     """
@@ -133,6 +137,7 @@ def kmeans_segment_images(X, n_clusters=n_clusters, cache=False, load_from_cache
     return images
 
 
-def big_picture(X):
+def big_picture(X, y):
     kmeans_segmented_images = kmeans_segment_images(X[0:5], [5])
-    normalized_cut_segmented_images = spectral_segment_images(X[0:5], [5]) # 5-NN graph
+    normalized_cut_segmented_images = spectral_segment_images(X[0:5], y=y, n_clusters=[5], visualize=True) # 5-NN graph
+

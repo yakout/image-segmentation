@@ -72,6 +72,35 @@ def visualize_image(img, category):
 
 # visualize_image('22090', 'train')
 
+def visualize_result(original_image, segmented_image, gt):
+    """
+    This functino will visualize the result of a segmentation algorithm against
+    its ground truth image.
+    """
+    rows = 3
+    cols = gt.shape[0]
+    fig = plt.figure()
+
+    ax = fig.add_subplot(rows, cols, 1)
+    ax.set_title('original image')
+    plt.axis('off')
+    plt.imshow(original_image)
+    ax = fig.add_subplot(rows, cols, 2)
+    ax.set_title('segmented image')
+    plt.axis('off')
+    plt.imshow(segmented_image)
+    for m in range(cols):
+        ax = fig.add_subplot(rows, cols, cols + i)
+        ax.set_title('ground truth segmentation')
+        plt.axis('off')
+        plt.imshow(gt[i, :, :, 0])
+
+    for m in range(cols):
+        ax = fig.add_subplot(rows, cols, (cols * 2) + i)
+        ax.set_title('ground truth boundries')
+        plt.axis('off')
+        plt.imshow(gt[i, :, :, 1])
+
 def get_gt_image(img_name, category):
     mat = get_segment(img_name, category)
     human_participants_num = mat['groundTruth'].shape[1]
