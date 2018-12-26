@@ -72,14 +72,14 @@ def visualize_image(img, category):
 
 # visualize_image('22090', 'train')
 
-def visualize_result(original_image, segmented_image, gt):
+def visualize_result(original_image, segmented_image, gt, savefig=False, save_path=None):
     """
     This functino will visualize the result of a segmentation algorithm against
     its ground truth image.
     """
     rows = 3
     cols = gt.shape[0]
-    fig = plt.figure()
+    fig = plt.figure(figsize=(12, 12))
 
     ax = fig.add_subplot(rows, cols, 1)
     ax.set_title('original image')
@@ -89,17 +89,19 @@ def visualize_result(original_image, segmented_image, gt):
     ax.set_title('segmented image')
     plt.axis('off')
     plt.imshow(segmented_image)
+    if save_path is not None:
+        plt.savefig(save_path)
     for m in range(cols):
-        ax = fig.add_subplot(rows, cols, cols + i)
-        ax.set_title('ground truth segmentation')
+        ax = fig.add_subplot(rows, cols, cols + 1 + m)
+        ax.set_title('GT segmentation')
         plt.axis('off')
-        plt.imshow(gt[i, :, :, 0])
+        plt.imshow(gt[m, :, :, 0])
 
     for m in range(cols):
-        ax = fig.add_subplot(rows, cols, (cols * 2) + i)
-        ax.set_title('ground truth boundries')
+        ax = fig.add_subplot(rows, cols, (cols * 2) + 1 + m)
+        ax.set_title('GT boundries')
         plt.axis('off')
-        plt.imshow(gt[i, :, :, 1])
+        plt.imshow(gt[m, :, :, 1])
 
 def get_gt_image(img_name, category):
     mat = get_segment(img_name, category)

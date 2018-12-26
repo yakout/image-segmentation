@@ -2,6 +2,7 @@ from sklearn.cluster import SpectralClustering
 from skimage.transform import resize
 from scipy.misc import imresize
 
+
 from k_means import KMeans
 from utils import *
 
@@ -81,7 +82,7 @@ def spectral_segment_images(X, y=None, n_clusters=n_clusters,
                 its ground truth images. (Must provide y)
     """
     if load_from_cache:
-        return np.load('./cache/spectral_segment_images.txt')
+        return np.load('./cache/spectral_segment_images.npy')
     Ks = n_clusters
     N = X.shape[0]
     clustered_images = []
@@ -95,19 +96,20 @@ def spectral_segment_images(X, y=None, n_clusters=n_clusters,
                                         n_neighbors=n_neighbors,
                                         gamma=gamma,
                                         include_spatial=include_spatial)
-            if visualize and y != None:
-                visualize_result(X[i], res, y[i])
+            if visualize and y is not None:
+                visualize_result(X[i], res, y[i], save_path=f'./images/{i}_k-{k}.jpg')
             K_images.append(res)
         clustered_images.append(K_images)
     clustered_images = np.array(clustered_images)
 
     if cache:
-        np.save('./cache/spectral_segment_images.txt', clustered_images)
+        np.save('./cache/spectral_segment_images.npy', clustered_images)
     # print(images.shape)
     return clustered_images
         
 
-def kmeans_segment_images(X, n_clusters=n_clusters, cache=False, load_from_cache=False):
+def kmeans_segment_images(X, y=None, n_clusters=n_clusters, cache=False,
+                                     load_from_cache=False, visualize=False):
     """
     will return (N, K, d)
     """
@@ -124,10 +126,8 @@ def kmeans_segment_images(X, n_clusters=n_clusters, cache=False, load_from_cache
         for j, k in enumerate(Ks):
             clusters, _ = kmeans_segment(img, n_clusters=k)
             seg_image = clusters.reshape(img_size)
-            plt.figure()
-            plt.imshow(seg_image)
-            plt.axis('off')
-            plt.savefig(f'./images/{i}_k-{k}.jpg')
+            if visualize and y is not None:
+                visualize_result(X[i], seg_image, y[i])
             K_images.append(seg_image)
         images.append(K_images)
     images = np.array(images)
@@ -137,7 +137,6 @@ def kmeans_segment_images(X, n_clusters=n_clusters, cache=False, load_from_cache
     return images
 
 
-def big_picture(X, y):
-    kmeans_segmented_images = kmeans_segment_images(X[0:5], [5])
-    normalized_cut_segmented_images = spectral_segment_images(X[0:5], y=y, n_clusters=[5], visualize=True) # 5-NN graph
-
+def big_picture(X, y, n_images=5, n_clusters=[5]):
+    kmeans_segment_images(X[0:n_images], y=y, n_clusters=n_clusters, cache=True, visualize=True)
+    spectral_segment_images(X[0:n_images], y=y, n_clusters=n_clusters, cache=True, visualize=True) # 5-NN graph
