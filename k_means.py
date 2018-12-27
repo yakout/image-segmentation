@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import euclidean_distances
 def k_means(data_points, n_clusters, max_iter, eps=0.001):
     """
     K-Means Algorithm
+    it will return np array of shape (n*m, 1)
     """
     if max_iter <= 0:
         raise ValueError('Invalid value of max iteration: %d' % max_iter)
@@ -38,7 +39,9 @@ def k_means(data_points, n_clusters, max_iter, eps=0.001):
         
 #         print(centroids.shape)
         error = np.linalg.norm(centroids - centroids_old)
-    return clusters, centroids
+
+    # print("clusters.shape before = {}".format(clusters.shape))
+    return clusters
     
 
 class KMeans():

@@ -89,8 +89,6 @@ def visualize_result(original_image, segmented_image, gt, savefig=False, save_pa
     ax.set_title('segmented image')
     plt.axis('off')
     plt.imshow(segmented_image)
-    if save_path is not None:
-        plt.savefig(save_path)
     for m in range(cols):
         ax = fig.add_subplot(rows, cols, cols + 1 + m)
         ax.set_title('GT segmentation')
@@ -102,6 +100,10 @@ def visualize_result(original_image, segmented_image, gt, savefig=False, save_pa
         ax.set_title('GT boundries')
         plt.axis('off')
         plt.imshow(gt[m, :, :, 1])
+
+    if save_path is not None:
+        plt.savefig(save_path)
+
 
 def get_gt_image(img_name, category):
     mat = get_segment(img_name, category)
